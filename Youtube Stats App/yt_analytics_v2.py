@@ -1,35 +1,37 @@
 # import libraries 
 from googleapiclient.discovery import build 
 import pprint 
-
 # arguments to be passed to build function 
-DEVELOPER_KEY = "AIzaSyDGaWqqiwM6YXAd_ETbsvh_d0OoLHaVvMU"
+DEVELOPER_KEY = "AIzaSyDGaWqqiwM6YXAd_ETbsvh_d0OoLHaVvMU" #My API Key
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
-# creating youtube resource object 
-# for interacting with API 
 youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey = DEVELOPER_KEY) 
 
 
-def video_details(video_id): 
+def channel_details(channel_id): 
 
    
-    list_videos_byid = youtube.channelSections().list(id = video_id, 
-        part = "id, snippet, contentDetails",).execute() 
+    channel_details_dict = youtube.channels().list(id = channel_id, part="id,snippet,statistics,status").execute() 
+    print(channel_details_dict)
+    channel_name=channel_details_dict ["items"][0]["statistics"]["subscriberCount"]
+    subscriber_count=channel_details_dict ["items"][0]["snippet"]["title"]
+    channel_created_date=channel_details_dict ["items"][0]["snippet"]["publishedAt"]
+    video_count=channel_details_dict ["items"][0]["statistics"]["videoCount"]
+    view_count=channel_details_dict ["items"][0]["statistics"]["viewCount"]
 
-        
-    results = list_videos_byid.get("items", [])
-    print(type(results))
-    for result in results:
-      for data in result:
-        print(result[data])
-        print()
-    print()
-      #videos.append("(% s) (% s) (% s) " % (result["snippet"],result['contentDetails'],result["statistics"]))  
-      #print("Videos:\n", "\n".join(videos), "\n")
+
+
+    print(channel_name, subscriber_count,channel_created_date)
+    
     
 if __name__ == "__main__": 
 
-    video_id = "UCIvaYmXn910QMdemBG3v1pQ"
-    video_details(video_id) 
+    channel_id = "youtube_analytics.reports().query(
+        dimensions="video",
+        ids="channel==MINE",
+        maxResults=10,
+        metrics="estimatedMinutesWatched,views,likes,subscribersGained",
+        sort="-estimatedMinutesWatched"
+    )"
+    channel_details(channel_id) 
